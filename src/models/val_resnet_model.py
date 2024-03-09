@@ -7,7 +7,7 @@ def validation(model, test_,):
     test_iter=0
     with torch.no_grad():
         for batch_idx, (data, target) in enumerate(test_):
-            data, target = cus_aug(Variable(data.to(device))), Variable(target.to(device)) x
+            data, target = cus_aug(Variable(data.to(device))), Variable(target.to(device)) 
             output = model(data)
             _, pred = torch.max(output, 1)
             pred = output.data.cpu().numpy()
