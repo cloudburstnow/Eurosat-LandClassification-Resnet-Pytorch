@@ -10,13 +10,16 @@ import time
 import numpy as np
 
 
-import torch.optim as optim
+#import torch.optim as optim
 import torch.optim.lr_scheduler
 import torch.nn.init
 from torch.autograd import Variable
 
 from sklearn.metrics import accuracy_score
 from skimage.transform import resize
+
+from .val_resnet_model import validation
+from .utils import *
 
 
 
@@ -46,7 +49,7 @@ def train(net, train_, val_, criterion, optimizer, epochs=None, scheduler=None, 
                     e, epochs, batch_idx, len(train_),
                     100. * batch_idx / len(train_), loss.item(), acc[-1],optimizer.param_groups[0]['lr']))
                 plt.plot(mean_losses) and plt.show()
-                val_acc = np.append(val_acc,validation(net, val_))
+                val_acc = np.append(val_acc,validation(net, val_, device))
                 print('validation accuracy : {}'.format(val_acc[-1]))
                 plt.plot( range(len(acc)) ,acc,'b',label = 'training')
                 plt.plot( range(len(val_acc)), val_acc,'r--',label = 'validation')
@@ -62,36 +65,3 @@ def train(net, train_, val_, criterion, optimizer, epochs=None, scheduler=None, 
     return net
 
 
-def get_random_pos(img, window_shape = [55,55] ):
-    """ Extract of 2D random patch of shape window_shape in the image """
-    w, h = window_shape
-    W, H = img.shape[-2:]
-    x1 = random.randint(0, W - w - 1)
-    y1 = random.randint(0, H - h - 1)
-
-    return x1, x1 + w, y1, y1 + h #x1, x2, y1, y2
-
-def random_crop_area(img):
-    x1,x2,y1,y2 = get_random_pos(img)
-    Sen_Im = img[:, x1:x2,y1:y2]
-    return resize(Sen_Im,img.shape,anti_aliasing=True)
-
-
-
-def sigmoid(z):
-    z = np.clip(z, -100, np.inf)
-    return 1 / (1 + np.exp(-z))
-
-
-def cus_aug(data):
-    data = torch.rot90(data,random.randint(-3,3), dims=random.choice([[3,2],[2,3]]))
-    if random.random()>0.75:
-        data = torch.flip(data, dims = random.choice([[2,],[3,],[2,3]]))
-    pixmis = torch.empty_like(data).random_(data.shape[-1])
-    pixmis = torch.where(pixmis>(data.shape[-1]/8),torch.ones_like(data),torch.zeros_like(data))
-    return data* pixmis
-
-
-def accuracy(gt_S,pred_S):       
-    _, alp = torch.max(torch.from_numpy(pred_S), 1)
-    return accuracy_score(gt_S,np.asarray(alp)) 

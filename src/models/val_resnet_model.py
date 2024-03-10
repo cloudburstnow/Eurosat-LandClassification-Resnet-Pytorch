@@ -2,7 +2,12 @@ import torch
 
 import numpy as np
 
-def validation(model, test_,):
+from torch.autograd import Variable
+
+
+from .utils import *
+
+def validation(model, test_, device='cpu'):
     model.eval()
     test_iter=0
     with torch.no_grad():
