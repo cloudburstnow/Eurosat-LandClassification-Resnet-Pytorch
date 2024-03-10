@@ -24,7 +24,6 @@ from .utils import *
 
 
 def train(net, train_, val_, criterion, optimizer, epochs=None, scheduler=None, weights=None, save_epoch = 10, device = 'cpu', save_path = './'):
-    print("correct")
     losses=[]; acc=[]; mean_losses=[]; val_acc=[]
     iter_ = t0 =0
     for e in range(1, epochs + 1):
@@ -42,11 +41,8 @@ def train(net, train_, val_, criterion, optimizer, epochs=None, scheduler=None, 
                 clear_output()
                 print('Iteration Number',iter_,'{} seconds'.format(time.time() - t0))
                 t0 = time.time()
-                pred_output = output.data.cpu().numpy()
-                pred=sigmoid(pred_output)
-                print(pred_output)
-                print(type(pred_output))
-                print(pred_output.shape)
+                pred = output.data.cpu().numpy()
+                pred=sigmoid(pred)
                 gt = target.data.cpu().numpy()
                 acc = np.append(acc,accuracy(gt,pred))
                 print('Train (epoch {}/{}) [{}/{} ({:.0f}%)]\tLoss: {:.6f}\tAccuracy: {}\tLearning Rate:{}'.format(
@@ -59,7 +55,6 @@ def train(net, train_, val_, criterion, optimizer, epochs=None, scheduler=None, 
                 plt.plot( range(len(val_acc)), val_acc,'r--',label = 'validation')
                 plt.legend() and plt.show()
             iter_ += 1
-            return pred_output
             del(data, target, loss)
         if scheduler is not None:
            scheduler.step()

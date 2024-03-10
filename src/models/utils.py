@@ -34,7 +34,7 @@ def random_crop_area(img):
 
 def sigmoid(z):
     with warnings.catch_warnings():
-        warnings.filterwarnings("ignore", category=RuntimeWarning)
+        warnings.filterwarnings("ignore", category=RuntimeWarning) # Overflows occur in the exp when a z value is between # -89 and 100, due to the floating point precision of float32
         z = np.clip(z, -100, 100)
         return 1 / (1 + np.exp(-z))
 
