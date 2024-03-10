@@ -4,6 +4,8 @@ import random
 from sklearn.metrics import accuracy_score
 from skimage.transform import resize
 
+import warnings
+
 import numpy as np
 
 def cus_aug(data):
@@ -31,8 +33,10 @@ def random_crop_area(img):
 
 
 def sigmoid(z):
-    z = np.clip(z, -100, np.inf)
-    return 1 / (1 + np.exp(-z))
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore", category=RuntimeWarning)
+        z = np.clip(z, -100, 100)
+        return 1 / (1 + np.exp(-z))
 
 
 def accuracy(gt_S,pred_S):       

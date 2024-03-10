@@ -23,7 +23,8 @@ from .utils import *
 
 
 
-def train(net, train_, val_, criterion, optimizer, epochs=None, scheduler=None, weights=None, save_epoch = 1, device = 'cpu'):
+def train(net, train_, val_, criterion, optimizer, epochs=None, scheduler=None, weights=None, save_epoch = 10, device = 'cpu', save_path = './'):
+    print("correct")
     losses=[]; acc=[]; mean_losses=[]; val_acc=[]
     iter_ = t0 =0
     for e in range(1, epochs + 1):
@@ -37,12 +38,15 @@ def train(net, train_, val_, criterion, optimizer, epochs=None, scheduler=None, 
             optimizer.step()
             losses = np.append(losses,loss.item())
             mean_losses = np.append(mean_losses, np.mean(losses[max(0,iter_-100):iter_]))
-            if iter_ % 40 == 0: #vary how often you want to update plots
+            if iter_ % 40 == 0: #vary how often ysou want to update plots
                 clear_output()
                 print('Iteration Number',iter_,'{} seconds'.format(time.time() - t0))
                 t0 = time.time()
-                pred = output.data.cpu().numpy()
-                pred=sigmoid(pred)
+                pred_output = output.data.cpu().numpy()
+                pred=sigmoid(pred_output)
+                print(pred_output)
+                print(type(pred_output))
+                print(pred_output.shape)
                 gt = target.data.cpu().numpy()
                 acc = np.append(acc,accuracy(gt,pred))
                 print('Train (epoch {}/{}) [{}/{} ({:.0f}%)]\tLoss: {:.6f}\tAccuracy: {}\tLearning Rate:{}'.format(
@@ -55,13 +59,13 @@ def train(net, train_, val_, criterion, optimizer, epochs=None, scheduler=None, 
                 plt.plot( range(len(val_acc)), val_acc,'r--',label = 'validation')
                 plt.legend() and plt.show()
             iter_ += 1
-            
+            return pred_output
             del(data, target, loss)
         if scheduler is not None:
            scheduler.step()
         if e % save_epoch == 0:
             
-            torch.save(net.state_dict(), '.\Eurosat{}'.format(e))
+            torch.save(net.state_dict(),'{}Eurosat{}'.format(save_path,e))
     return net
 
 
