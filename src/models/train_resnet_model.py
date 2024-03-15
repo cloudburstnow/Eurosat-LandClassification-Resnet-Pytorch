@@ -21,6 +21,8 @@ from skimage.transform import resize
 from .val_resnet_model import validation
 from .utils import *
 
+from torch.optim.lr_scheduler import ReduceLROnPlateau
+
 
 
 def train(net, train_, val_, criterion, optimizer, epochs=None, scheduler=None, weights=None, save_epoch = 10, device = 'cpu', save_path = './'):
@@ -57,7 +59,11 @@ def train(net, train_, val_, criterion, optimizer, epochs=None, scheduler=None, 
             iter_ += 1
             del(data, target, loss)
         if scheduler is not None:
-           scheduler.step()
+            if isinstance(scheduler, ReduceLROnPlateau):
+                scheduler.step(mean_losses[-1])
+            else:
+                scheduler.step()
+
         if e % save_epoch == 0:
             
             torch.save(net.state_dict(),'{}Eurosat{}'.format(save_path,e))

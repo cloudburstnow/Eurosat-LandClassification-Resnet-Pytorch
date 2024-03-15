@@ -4,3 +4,5 @@ models/*
 notebooks/landuse_pytorch.ipynb
 notebooks/landuse_pytorch.ipynb
 res18/*
+res18sch/
+res50sch/
